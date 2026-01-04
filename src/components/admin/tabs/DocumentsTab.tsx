@@ -2,16 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
-import { Badge } from '../../ui/badge';
 import { Textarea } from '../../ui/textarea';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '../../ui/table';
 import {
   Select,
   SelectContent,
@@ -27,7 +18,6 @@ import {
   CheckCircle,
   XCircle,
   FileText,
-  Eye,
   Check,
   X,
   AlertCircle
@@ -37,7 +27,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter
 } from '../../ui/dialog';
 import { supabase } from '../../../lib/supabase';
@@ -51,12 +40,6 @@ interface Document {
   uploaded_at: string;
   reviewed_at: string | null;
 }
-
-const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
-  pending: { label: 'En attente', color: 'bg-amber-100 text-amber-700', icon: Clock },
-  approved: { label: 'Approuve', color: 'bg-emerald-100 text-emerald-700', icon: CheckCircle },
-  rejected: { label: 'Rejete', color: 'bg-red-100 text-red-700', icon: XCircle }
-};
 
 export function DocumentsTab() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -129,7 +112,24 @@ export function DocumentsTab() {
     rejected: documents.filter(d => d.status === 'rejected').length
   };
 
-  const documentTypes = [...new Set(documents.map(d => d.document_type))];
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return { bg: 'bg-green-50', text: 'text-green-700', icon: CheckCircle };
+      case 'rejected':
+        return { bg: 'bg-red-50', text: 'text-red-700', icon: XCircle };
+      default:
+        return { bg: 'bg-amber-50', text: 'text-amber-700', icon: Clock };
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'approved': return 'Approuve';
+      case 'rejected': return 'Rejete';
+      default: return 'En attente';
+    }
+  };
 
   if (isLoading) {
     return (
@@ -141,106 +141,85 @@ export function DocumentsTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card className="border-0 shadow-sm">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Total Documents</p>
-                <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
+            <div className="flex items-center gap-3">
+              <div className="bg-slate-100 p-2.5 rounded-xl">
+                <FileText className="w-5 h-5 text-slate-600" />
               </div>
-              <div className="bg-slate-100 p-3 rounded-xl">
-                <FileText className="w-6 h-6 text-slate-600" />
+              <div>
+                <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
+                <p className="text-sm text-slate-500">Total</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm border-l-4 border-l-amber-500">
+        <Card className="bg-white border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">En Attente</p>
-                <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
+            <div className="flex items-center gap-3">
+              <div className="bg-amber-100 p-2.5 rounded-xl">
+                <Clock className="w-5 h-5 text-amber-600" />
               </div>
-              <div className="bg-amber-100 p-3 rounded-xl">
-                <Clock className="w-6 h-6 text-amber-600" />
+              <div>
+                <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
+                <p className="text-sm text-slate-500">En Attente</p>
               </div>
             </div>
             {stats.pending > 0 && (
-              <div className="mt-2 flex items-center gap-1.5 text-amber-600 text-xs">
+              <div className="mt-2 flex items-center gap-1 text-amber-600 text-xs">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>Necessite verification</span>
               </div>
             )}
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="bg-white border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-green-100 p-2.5 rounded-xl">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              </div>
               <div>
+                <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
                 <p className="text-sm text-slate-500">Approuves</p>
-                <p className="text-2xl font-bold text-emerald-600">{stats.approved}</p>
-              </div>
-              <div className="bg-emerald-100 p-3 rounded-xl">
-                <CheckCircle className="w-6 h-6 text-emerald-600" />
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="bg-white border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Rejetes</p>
-                <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
+            <div className="flex items-center gap-3">
+              <div className="bg-red-100 p-2.5 rounded-xl">
+                <XCircle className="w-5 h-5 text-red-600" />
               </div>
-              <div className="bg-red-100 p-3 rounded-xl">
-                <XCircle className="w-6 h-6 text-red-600" />
+              <div>
+                <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
+                <p className="text-sm text-slate-500">Rejetes</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {documentTypes.map((type, index) => {
-          const count = documents.filter(d => d.document_type === type).length;
-          const pending = documents.filter(d => d.document_type === type && d.status === 'pending').length;
-          return (
-            <Badge
-              key={index}
-              variant="outline"
-              className={`px-3 py-1 ${pending > 0 ? 'bg-amber-50 border-amber-200' : 'bg-slate-50'}`}
-            >
-              {type} ({count})
-              {pending > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 bg-amber-500 text-white text-xs rounded-full">
-                  {pending}
-                </span>
-              )}
-            </Badge>
-          );
-        })}
-      </div>
-
-      <Card className="border-0 shadow-sm">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row gap-4 justify-between">
+      <Card className="bg-white border-0 shadow-sm">
+        <CardHeader className="border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <CardTitle className="text-lg font-semibold text-slate-800">
               Verification des Documents
             </CardTitle>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   placeholder="Rechercher..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 w-full sm:w-64"
+                  className="pl-9 w-full sm:w-64 bg-slate-50 border-0"
                 />
               </div>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-full sm:w-40">
+                <SelectTrigger className="w-full sm:w-40 bg-slate-50 border-0">
                   <SelectValue placeholder="Statut" />
                 </SelectTrigger>
                 <SelectContent>
@@ -253,96 +232,85 @@ export function DocumentsTab() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {filteredDocuments.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
-              <FileCheck className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Aucun document trouve</p>
+            <div className="text-center py-16">
+              <FileCheck className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+              <p className="text-slate-500">Aucun document trouve</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Fichier</TableHead>
-                    <TableHead>Date Upload</TableHead>
-                    <TableHead>Date Review</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredDocuments.map((doc) => {
-                    const config = statusConfig[doc.status] || statusConfig.pending;
-                    const Icon = config.icon;
-                    return (
-                      <TableRow key={doc.id}>
-                        <TableCell className="font-medium">{doc.document_type}</TableCell>
-                        <TableCell className="text-slate-600 max-w-[200px] truncate">
+            <div className="divide-y divide-slate-100">
+              {filteredDocuments.map((doc) => {
+                const statusStyle = getStatusStyle(doc.status);
+                const Icon = statusStyle.icon;
+                return (
+                  <div
+                    key={doc.id}
+                    className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-5 h-5 text-slate-600" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-slate-800">{doc.document_type}</p>
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${statusStyle.bg} ${statusStyle.text} flex items-center gap-1`}>
+                            <Icon className="w-3 h-3" />
+                            {getStatusLabel(doc.status)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-500 truncate mt-0.5">
                           {doc.file_name}
-                        </TableCell>
-                        <TableCell className="text-slate-600">
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 ml-4">
+                      <div className="text-right hidden md:block">
+                        <p className="text-xs text-slate-400">
                           {new Date(doc.uploaded_at).toLocaleDateString('fr-FR')}
-                        </TableCell>
-                        <TableCell className="text-slate-600">
-                          {doc.reviewed_at
-                            ? new Date(doc.reviewed_at).toLocaleDateString('fr-FR')
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={config.color}>
-                            <Icon className="w-3 h-3 mr-1" />
-                            {config.label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {doc.status === 'pending' && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  onClick={() => updateDocumentStatus(doc.id, 'approved')}
-                                  className="bg-emerald-600 hover:bg-emerald-700 h-8"
-                                >
-                                  <Check className="w-3 h-3 mr-1" />
-                                  Approuver
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => {
-                                    setSelectedDocument(doc);
-                                    setIsReviewOpen(true);
-                                  }}
-                                  className="h-8"
-                                >
-                                  <X className="w-3 h-3 mr-1" />
-                                  Rejeter
-                                </Button>
-                              </>
-                            )}
-                            {doc.status !== 'pending' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setSelectedDocument(doc);
-                                  setIsReviewOpen(true);
-                                }}
-                                className="h-8"
-                              >
-                                <Eye className="w-3 h-3 mr-1" />
-                                Voir
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                        </p>
+                      </div>
+                      {doc.status === 'pending' ? (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updateDocumentStatus(doc.id, 'approved')}
+                            className="bg-green-600 hover:bg-green-700 h-8"
+                          >
+                            <Check className="w-3 h-3 mr-1" />
+                            Approuver
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              setSelectedDocument(doc);
+                              setIsReviewOpen(true);
+                            }}
+                            className="h-8"
+                          >
+                            <X className="w-3 h-3 mr-1" />
+                            Rejeter
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedDocument(doc);
+                            setIsReviewOpen(true);
+                          }}
+                          className="h-8"
+                        >
+                          Voir
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardContent>
@@ -351,18 +319,13 @@ export function DocumentsTab() {
       <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-lg font-semibold">
               {selectedDocument?.status === 'pending' ? 'Rejeter le Document' : 'Details du Document'}
             </DialogTitle>
-            <DialogDescription>
-              {selectedDocument?.status === 'pending'
-                ? 'Indiquez la raison du rejet'
-                : 'Informations sur le document'}
-            </DialogDescription>
           </DialogHeader>
           {selectedDocument && (
             <div className="space-y-4">
-              <div className="p-4 bg-slate-50 rounded-lg space-y-2">
+              <div className="p-4 bg-slate-50 rounded-xl space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-slate-500">Type:</span>
                   <span className="text-sm font-medium text-slate-800">
@@ -398,11 +361,13 @@ export function DocumentsTab() {
               )}
 
               {selectedDocument.status !== 'pending' && (
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50">
+                <div className={`flex items-center gap-2 p-3 rounded-xl ${
+                  selectedDocument.status === 'approved' ? 'bg-green-50' : 'bg-red-50'
+                }`}>
                   {selectedDocument.status === 'approved' ? (
                     <>
-                      <CheckCircle className="w-5 h-5 text-emerald-600" />
-                      <span className="text-sm text-emerald-700">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-sm text-green-700">
                         Document approuve le{' '}
                         {selectedDocument.reviewed_at
                           ? new Date(selectedDocument.reviewed_at).toLocaleDateString('fr-FR')

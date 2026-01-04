@@ -2,15 +2,6 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
-import { Badge } from '../../ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '../../ui/table';
 import {
   Search,
   Loader2,
@@ -18,24 +9,16 @@ import {
   Phone,
   Mail,
   MapPin,
-  MoreVertical,
   Eye,
   MessageCircle,
   Linkedin,
   Facebook
 } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '../../ui/dropdown-menu';
-import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogDescription
+  DialogTitle
 } from '../../ui/dialog';
 import { supabase } from '../../../lib/supabase';
 
@@ -109,145 +92,130 @@ export function AgentsTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border-0 shadow-sm">
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="bg-white border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-slate-100 p-2.5 rounded-xl">
+                <Users className="w-5 h-5 text-slate-600" />
+              </div>
               <div>
-                <p className="text-sm text-slate-500">Total Agents</p>
                 <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
-              </div>
-              <div className="bg-pink-100 p-3 rounded-xl">
-                <Users className="w-6 h-6 text-pink-600" />
+                <p className="text-sm text-slate-500">Agents</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="bg-white border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-100 p-2.5 rounded-xl">
+                <MapPin className="w-5 h-5 text-blue-600" />
+              </div>
               <div>
-                <p className="text-sm text-slate-500">Regions Couvertes</p>
                 <p className="text-2xl font-bold text-blue-600">{stats.regions}</p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <MapPin className="w-6 h-6 text-blue-600" />
+                <p className="text-sm text-slate-500">Regions</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm">
+        <Card className="bg-white border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">Fournisseurs Representes</p>
-                <p className="text-2xl font-bold text-emerald-600">{stats.suppliers}</p>
+            <div className="flex items-center gap-3">
+              <div className="bg-emerald-100 p-2.5 rounded-xl">
+                <Users className="w-5 h-5 text-emerald-600" />
               </div>
-              <div className="bg-emerald-100 p-3 rounded-xl">
-                <Users className="w-6 h-6 text-emerald-600" />
+              <div>
+                <p className="text-2xl font-bold text-emerald-600">{stats.suppliers}</p>
+                <p className="text-sm text-slate-500">Fournisseurs</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {regions.map((region, index) => {
-          const count = agents.filter(a => a.region === region).length;
-          return (
-            <Badge key={index} variant="outline" className="px-3 py-1 bg-slate-50">
-              {region} ({count})
-            </Badge>
-          );
-        })}
-      </div>
-
-      <Card className="border-0 shadow-sm">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row gap-4 justify-between">
+      <Card className="bg-white border-0 shadow-sm">
+        <CardHeader className="border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <CardTitle className="text-lg font-semibold text-slate-800">
               Liste des Agents Commerciaux
             </CardTitle>
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
-                placeholder="Rechercher par nom, email, region..."
+                placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 w-full sm:w-80"
+                className="pl-9 w-full sm:w-80 bg-slate-50 border-0"
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {filteredAgents.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
-              <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Aucun agent trouve</p>
+            <div className="text-center py-16">
+              <Users className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+              <p className="text-slate-500">Aucun agent trouve</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Agent</TableHead>
-                    <TableHead>Fournisseur</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Telephone</TableHead>
-                    <TableHead>Region</TableHead>
-                    <TableHead>Reseaux</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAgents.map((agent) => (
-                    <TableRow key={agent.id}>
-                      <TableCell className="font-medium">{agent.name}</TableCell>
-                      <TableCell className="text-slate-600">
-                        {agent.suppliers?.company_name || '-'}
-                      </TableCell>
-                      <TableCell className="text-slate-600">{agent.email}</TableCell>
-                      <TableCell className="text-slate-600">{agent.phone}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700">
+            <div className="divide-y divide-slate-100">
+              {filteredAgents.map((agent) => (
+                <div
+                  key={agent.id}
+                  className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
+                >
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-slate-600" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium text-slate-800">{agent.name}</p>
+                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
                           {agent.region}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {agent.whatsapp && (
-                            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                              <MessageCircle className="w-3 h-3 text-green-600" />
-                            </div>
-                          )}
-                          {agent.facebook && (
-                            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                              <Facebook className="w-3 h-3 text-blue-600" />
-                            </div>
-                          )}
-                          {agent.linkedin && (
-                            <div className="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center">
-                              <Linkedin className="w-3 h-3 text-sky-600" />
-                            </div>
-                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
+                        <span>{agent.suppliers?.company_name || 'Independant'}</span>
+                        <span className="text-slate-300">|</span>
+                        <span className="hidden sm:flex items-center gap-1">
+                          <Mail className="w-3.5 h-3.5" /> {agent.email}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 ml-4">
+                    <div className="hidden md:flex items-center gap-1.5">
+                      {agent.whatsapp && (
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                          <MessageCircle className="w-3 h-3 text-green-600" />
                         </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setSelectedAgent(agent);
-                            setIsDetailOpen(true);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                      )}
+                      {agent.facebook && (
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Facebook className="w-3 h-3 text-blue-600" />
+                        </div>
+                      )}
+                      {agent.linkedin && (
+                        <div className="w-6 h-6 bg-sky-100 rounded-full flex items-center justify-center">
+                          <Linkedin className="w-3 h-3 text-sky-600" />
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => {
+                        setSelectedAgent(agent);
+                        setIsDetailOpen(true);
+                      }}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
@@ -256,56 +224,55 @@ export function AgentsTab() {
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Details de l'Agent</DialogTitle>
-            <DialogDescription>Informations de contact</DialogDescription>
+            <DialogTitle className="text-lg font-semibold">Details de l'Agent</DialogTitle>
           </DialogHeader>
           {selectedAgent && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg">
-                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-pink-600" />
+            <div className="space-y-5">
+              <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
+                <div className="w-14 h-14 bg-slate-200 rounded-xl flex items-center justify-center">
+                  <Users className="w-7 h-7 text-slate-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-800">{selectedAgent.name}</h3>
+                  <h3 className="font-semibold text-slate-800 text-lg">{selectedAgent.name}</h3>
                   <p className="text-sm text-slate-500">
                     {selectedAgent.suppliers?.company_name || 'Agent independant'}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Mail className="w-4 h-4 text-slate-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">Email</p>
+                    <p className="text-xs text-slate-500 mb-0.5">Email</p>
                     <p className="text-sm font-medium text-slate-800">{selectedAgent.email}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Phone className="w-4 h-4 text-slate-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">Telephone</p>
+                    <p className="text-xs text-slate-500 mb-0.5">Telephone</p>
                     <p className="text-sm font-medium text-slate-800">{selectedAgent.phone}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4 text-slate-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500">Region</p>
+                    <p className="text-xs text-slate-500 mb-0.5">Region</p>
                     <p className="text-sm font-medium text-slate-800">{selectedAgent.region}</p>
                   </div>
                 </div>
               </div>
 
               <div className="pt-2">
-                <p className="text-xs text-slate-500 mb-2">Reseaux sociaux</p>
-                <div className="flex gap-3">
+                <p className="text-xs text-slate-500 mb-3">Reseaux sociaux</p>
+                <div className="flex flex-wrap gap-2">
                   {selectedAgent.whatsapp && (
                     <a
                       href={`https://wa.me/${selectedAgent.whatsapp}`}

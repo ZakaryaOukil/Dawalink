@@ -9,11 +9,12 @@ import {
   FileCheck,
   Star,
   TrendingUp,
-  TrendingDown,
   AlertCircle,
   CheckCircle,
   Clock,
-  Loader2
+  Loader2,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
@@ -135,99 +136,142 @@ export function OverviewTab() {
     );
   }
 
-  const statCards = [
+  const mainStats = [
     {
       title: 'Pharmacies',
       value: stats?.totalPharmacies || 0,
       subValue: `${stats?.activePharmacies || 0} verifiees`,
       icon: Building2,
-      color: 'bg-blue-500',
-      trend: stats?.activePharmacies && stats.totalPharmacies ?
-        Math.round((stats.activePharmacies / stats.totalPharmacies) * 100) : 0
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      trend: stats?.activePharmacies && stats.totalPharmacies
+        ? Math.round((stats.activePharmacies / stats.totalPharmacies) * 100)
+        : 0,
+      trendUp: true
     },
     {
       title: 'Fournisseurs',
       value: stats?.totalSuppliers || 0,
       subValue: `${stats?.activeSuppliers || 0} verifies`,
       icon: Truck,
-      color: 'bg-emerald-500',
-      trend: stats?.activeSuppliers && stats.totalSuppliers ?
-        Math.round((stats.activeSuppliers / stats.totalSuppliers) * 100) : 0
+      iconBg: 'bg-emerald-100',
+      iconColor: 'text-emerald-600',
+      trend: stats?.activeSuppliers && stats.totalSuppliers
+        ? Math.round((stats.activeSuppliers / stats.totalSuppliers) * 100)
+        : 0,
+      trendUp: true
     },
     {
       title: 'Produits',
       value: stats?.totalProducts || 0,
-      subValue: 'produits enregistres',
+      subValue: 'au catalogue',
       icon: Package,
-      color: 'bg-amber-500'
+      iconBg: 'bg-amber-100',
+      iconColor: 'text-amber-600'
     },
     {
       title: 'Commandes',
       value: stats?.totalOrders || 0,
       subValue: `${stats?.pendingOrders || 0} en attente`,
       icon: ShoppingCart,
-      color: 'bg-purple-500'
-    },
+      iconBg: 'bg-teal-100',
+      iconColor: 'text-teal-600',
+      alert: (stats?.pendingOrders || 0) > 0
+    }
+  ];
+
+  const secondaryStats = [
     {
-      title: 'Agents Commerciaux',
+      title: 'Agents',
       value: stats?.totalAgents || 0,
-      subValue: 'agents actifs',
       icon: Users,
-      color: 'bg-pink-500'
+      iconBg: 'bg-slate-100',
+      iconColor: 'text-slate-600'
     },
     {
-      title: 'Documents',
+      title: 'Documents en attente',
       value: stats?.pendingDocuments || 0,
-      subValue: 'en attente de verification',
       icon: FileCheck,
-      color: 'bg-orange-500',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600',
       alert: (stats?.pendingDocuments || 0) > 0
     },
     {
       title: 'Note Moyenne',
       value: stats?.averageRating?.toFixed(1) || '0.0',
-      subValue: `${stats?.totalReviews || 0} evaluations`,
+      subValue: `${stats?.totalReviews || 0} avis`,
       icon: Star,
-      color: 'bg-yellow-500'
+      iconBg: 'bg-yellow-100',
+      iconColor: 'text-yellow-600'
     },
     {
-      title: 'Livraisons',
+      title: 'Livrees',
       value: stats?.deliveredOrders || 0,
-      subValue: 'commandes livrees',
       icon: CheckCircle,
-      color: 'bg-teal-500'
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600'
     }
   ];
 
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case 'delivered':
+        return 'bg-green-50 text-green-700 border-green-200';
+      case 'pending':
+        return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'shipped':
+        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'confirmed':
+        return 'bg-teal-50 text-teal-700 border-teal-200';
+      case 'approved':
+        return 'bg-green-50 text-green-700 border-green-200';
+      case 'rejected':
+        return 'bg-red-50 text-red-700 border-red-200';
+      default:
+        return 'bg-slate-50 text-slate-700 border-slate-200';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'delivered': return 'Livre';
+      case 'pending': return 'En attente';
+      case 'shipped': return 'Expedie';
+      case 'confirmed': return 'Confirme';
+      case 'approved': return 'Approuve';
+      case 'rejected': return 'Rejete';
+      default: return status;
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, index) => {
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {mainStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500 font-medium">{stat.title}</p>
-                    <p className="text-2xl font-bold text-slate-800 mt-1">{stat.value}</p>
-                    <p className="text-xs text-slate-400 mt-1">{stat.subValue}</p>
+            <Card key={index} className="bg-white border-0 shadow-sm">
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`${stat.iconBg} p-2.5 rounded-xl`}>
+                    <Icon className={`w-5 h-5 ${stat.iconColor}`} />
                   </div>
-                  <div className={`${stat.color} p-2.5 rounded-xl`}>
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
+                  {stat.trend !== undefined && (
+                    <div className={`flex items-center gap-1 text-xs font-medium ${stat.trendUp ? 'text-green-600' : 'text-red-600'}`}>
+                      {stat.trendUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                      {stat.trend}%
+                    </div>
+                  )}
+                  {stat.alert && (
+                    <div className="flex items-center gap-1 text-xs font-medium text-orange-600">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                    </div>
+                  )}
                 </div>
-                {stat.alert && (
-                  <div className="mt-3 flex items-center gap-1.5 text-orange-600 text-xs">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    <span>Necessite attention</span>
-                  </div>
-                )}
-                {stat.trend !== undefined && (
-                  <div className="mt-3 flex items-center gap-1.5 text-emerald-600 text-xs">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span>{stat.trend}% verifies</span>
-                  </div>
+                <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
+                <p className="text-sm text-slate-500 mt-1">{stat.title}</p>
+                {stat.subValue && (
+                  <p className="text-xs text-slate-400 mt-0.5">{stat.subValue}</p>
                 )}
               </CardContent>
             </Card>
@@ -235,46 +279,62 @@ export function OverviewTab() {
         })}
       </div>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {secondaryStats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={index} className="bg-white border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className={`${stat.iconBg} p-2 rounded-lg`}>
+                    <Icon className={`w-4 h-4 ${stat.iconColor}`} />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-slate-800">{stat.value}</p>
+                    <p className="text-xs text-slate-500">{stat.title}</p>
+                  </div>
+                  {stat.alert && (
+                    <AlertCircle className="w-4 h-4 text-orange-500 ml-auto" />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5 text-teal-600" />
+        <Card className="bg-white border-0 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
+              <ShoppingCart className="w-4 h-4 text-teal-600" />
               Commandes Recentes
             </CardTitle>
           </CardHeader>
           <CardContent>
             {recentOrders.length === 0 ? (
-              <p className="text-slate-500 text-sm text-center py-8">
-                Aucune commande pour le moment
-              </p>
+              <div className="text-center py-8">
+                <ShoppingCart className="w-10 h-10 text-slate-200 mx-auto mb-2" />
+                <p className="text-sm text-slate-500">Aucune commande</p>
+              </div>
             ) : (
               <div className="space-y-3">
                 {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                    <div>
-                      <p className="text-sm font-medium text-slate-800">
+                  <div key={order.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-800 truncate">
                         {order.products?.name || 'Produit'}
                       </p>
-                      <p className="text-xs text-slate-500">
-                        {order.pharmacies?.pharmacy_name} → {order.suppliers?.company_name}
+                      <p className="text-xs text-slate-500 truncate">
+                        {order.pharmacies?.pharmacy_name}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-slate-800">
+                    <div className="flex items-center gap-3 ml-3">
+                      <span className={`text-xs px-2 py-1 rounded-lg border ${getStatusStyle(order.status)}`}>
+                        {getStatusLabel(order.status)}
+                      </span>
+                      <span className="text-sm font-semibold text-slate-800 whitespace-nowrap">
                         {order.total_price} DH
-                      </p>
-                      <span className={`
-                        text-xs px-2 py-0.5 rounded-full
-                        ${order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' :
-                          order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                          order.status === 'shipped' ? 'bg-blue-100 text-blue-700' :
-                          'bg-slate-100 text-slate-700'}
-                      `}>
-                        {order.status === 'delivered' ? 'Livre' :
-                         order.status === 'pending' ? 'En attente' :
-                         order.status === 'shipped' ? 'Expedie' :
-                         order.status === 'confirmed' ? 'Confirme' : 'Annule'}
                       </span>
                     </div>
                   </div>
@@ -284,41 +344,36 @@ export function OverviewTab() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <FileCheck className="w-5 h-5 text-teal-600" />
+        <Card className="bg-white border-0 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-teal-600" />
               Documents Recents
             </CardTitle>
           </CardHeader>
           <CardContent>
             {recentDocuments.length === 0 ? (
-              <p className="text-slate-500 text-sm text-center py-8">
-                Aucun document pour le moment
-              </p>
+              <div className="text-center py-8">
+                <FileCheck className="w-10 h-10 text-slate-200 mx-auto mb-2" />
+                <p className="text-sm text-slate-500">Aucun document</p>
+              </div>
             ) : (
               <div className="space-y-3">
                 {recentDocuments.map((doc) => (
-                  <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                    <div>
+                  <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-slate-800">
                         {doc.document_type}
                       </p>
-                      <p className="text-xs text-slate-500 truncate max-w-[200px]">
+                      <p className="text-xs text-slate-500 truncate">
                         {doc.file_name}
                       </p>
                     </div>
-                    <span className={`
-                      text-xs px-2 py-0.5 rounded-full flex items-center gap-1
-                      ${doc.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
-                        doc.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                        'bg-red-100 text-red-700'}
-                    `}>
-                      {doc.status === 'approved' ? <CheckCircle className="w-3 h-3" /> :
-                       doc.status === 'pending' ? <Clock className="w-3 h-3" /> :
-                       <AlertCircle className="w-3 h-3" />}
-                      {doc.status === 'approved' ? 'Approuve' :
-                       doc.status === 'pending' ? 'En attente' : 'Rejete'}
+                    <span className={`text-xs px-2 py-1 rounded-lg border flex items-center gap-1.5 ${getStatusStyle(doc.status)}`}>
+                      {doc.status === 'approved' && <CheckCircle className="w-3 h-3" />}
+                      {doc.status === 'pending' && <Clock className="w-3 h-3" />}
+                      {doc.status === 'rejected' && <AlertCircle className="w-3 h-3" />}
+                      {getStatusLabel(doc.status)}
                     </span>
                   </div>
                 ))}
