@@ -60,7 +60,7 @@ export function PharmaciesTab() {
     try {
       const { data, error } = await supabase
         .from('pharmacies')
-        .select('*')
+        .select('id, pharmacy_name, license_number, phone, address, is_verified, is_blocked, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -96,11 +96,18 @@ export function PharmaciesTab() {
         .update({ is_blocked: isBlocked, updated_at: new Date().toISOString() })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating pharmacy blocked status:', error);
+        throw error;
+      }
 
       setPharmacies(prev => prev.map(p =>
         p.id === id ? { ...p, is_blocked: isBlocked } : p
       ));
+
+      if (selectedPharmacy?.id === id) {
+        setSelectedPharmacy({ ...selectedPharmacy, is_blocked: isBlocked });
+      }
     } catch (error) {
       console.error('Error updating pharmacy blocked status:', error);
     }

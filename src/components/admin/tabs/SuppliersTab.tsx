@@ -67,7 +67,7 @@ export function SuppliersTab() {
     try {
       const { data, error } = await supabase
         .from('suppliers')
-        .select('*')
+        .select('id, company_name, registry_number, phone, address, average_rating, total_reviews, response_rate, avg_response_time, is_verified, is_blocked, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -103,11 +103,18 @@ export function SuppliersTab() {
         .update({ is_blocked: isBlocked, updated_at: new Date().toISOString() })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating supplier blocked status:', error);
+        throw error;
+      }
 
       setSuppliers(prev => prev.map(s =>
         s.id === id ? { ...s, is_blocked: isBlocked } : s
       ));
+
+      if (selectedSupplier?.id === id) {
+        setSelectedSupplier({ ...selectedSupplier, is_blocked: isBlocked });
+      }
     } catch (error) {
       console.error('Error updating supplier blocked status:', error);
     }
