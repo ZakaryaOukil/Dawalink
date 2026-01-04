@@ -246,12 +246,12 @@ export function OverviewTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {mainStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index} className="bg-white border-0 shadow-sm">
-              <CardContent className="p-5">
+              <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-3">
                   <div className={`${stat.iconBg} p-2.5 rounded-xl`}>
                     <Icon className={`w-5 h-5 ${stat.iconColor}`} />
@@ -279,12 +279,12 @@ export function OverviewTab() {
         })}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {secondaryStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index} className="bg-white border-0 shadow-sm">
-              <CardContent className="p-4">
+              <CardContent className="p-5">
                 <div className="flex items-center gap-3">
                   <div className={`${stat.iconBg} p-2 rounded-lg`}>
                     <Icon className={`w-4 h-4 ${stat.iconColor}`} />
@@ -305,13 +305,13 @@ export function OverviewTab() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-white border-0 shadow-sm">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
               <ShoppingCart className="w-4 h-4 text-teal-600" />
               Commandes Recentes
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-6 pb-6">
             {recentOrders.length === 0 ? (
               <div className="text-center py-8">
                 <ShoppingCart className="w-10 h-10 text-slate-200 mx-auto mb-2" />
@@ -334,7 +334,7 @@ export function OverviewTab() {
                         {getStatusLabel(order.status)}
                       </span>
                       <span className="text-sm font-semibold text-slate-800 whitespace-nowrap">
-                        {order.total_price} DH
+                        {order.total_price} DZD
                       </span>
                     </div>
                   </div>
@@ -345,13 +345,13 @@ export function OverviewTab() {
         </Card>
 
         <Card className="bg-white border-0 shadow-sm">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-teal-600" />
               Documents Recents
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-6 pb-6">
             {recentDocuments.length === 0 ? (
               <div className="text-center py-8">
                 <FileCheck className="w-10 h-10 text-slate-200 mx-auto mb-2" />

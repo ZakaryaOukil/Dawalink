@@ -125,9 +125,9 @@ export function OrdersTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-white border-0 shadow-sm">
-          <CardContent className="p-4">
+          <CardContent className="p-5">
             <div className="flex items-center gap-3">
               <div className="bg-slate-100 p-2.5 rounded-xl">
                 <ShoppingCart className="w-5 h-5 text-slate-600" />
@@ -172,7 +172,7 @@ export function OrdersTab() {
                 <DollarSign className="w-5 h-5 text-teal-600" />
               </div>
               <div>
-                <p className="text-xl font-bold text-teal-600">{stats.totalRevenue.toLocaleString()} DH</p>
+                <p className="text-xl font-bold text-teal-600">{stats.totalRevenue.toLocaleString()} DZD</p>
                 <p className="text-sm text-slate-500">Chiffre d'affaires</p>
               </div>
             </div>
@@ -181,7 +181,7 @@ export function OrdersTab() {
       </div>
 
       <Card className="bg-white border-0 shadow-sm">
-        <CardHeader className="border-b border-slate-100">
+        <CardHeader className="border-b border-slate-100 px-6 py-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <CardTitle className="text-lg font-semibold text-slate-800">
               Historique des Commandes
@@ -253,7 +253,7 @@ export function OrdersTab() {
                     </div>
                     <div className="flex items-center gap-4 ml-4">
                       <div className="text-right hidden md:block">
-                        <p className="font-semibold text-slate-800">{order.total_price.toLocaleString()} DH</p>
+                        <p className="font-semibold text-slate-800">{order.total_price.toLocaleString()} DZD</p>
                         <p className="text-xs text-slate-400">
                           {new Date(order.created_at).toLocaleDateString('fr-FR')}
                         </p>

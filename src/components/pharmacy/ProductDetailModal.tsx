@@ -26,9 +26,9 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     {
       id: '1',
       name: 'Ahmed Bennani',
-      phone: '+213 XXX XXX XX1',
+      phone: '+213 555 123 456',
       email: 'ahmed.bennani@pharma.com',
-      whatsapp: '+213 XXX XXX XX1',
+      whatsapp: '+213 555 123 456',
       facebook: 'ahmed.bennani',
       linkedin: 'ahmed-bennani',
       region: 'Alger'
@@ -36,9 +36,9 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
     {
       id: '2',
       name: 'Fatima Alaoui',
-      phone: '+213 XXX XXX XX2',
+      phone: '+213 555 234 567',
       email: 'fatima.alaoui@pharma.com',
-      whatsapp: '+213 XXX XXX XX2',
+      whatsapp: '+213 555 234 567',
       region: 'Oran'
     },
   ];

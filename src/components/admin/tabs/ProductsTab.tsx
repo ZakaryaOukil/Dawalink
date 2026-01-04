@@ -89,9 +89,9 @@ export function ProductsTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-white border-0 shadow-sm">
-          <CardContent className="p-4">
+          <CardContent className="p-5">
             <div className="flex items-center gap-3">
               <div className="bg-amber-100 p-2.5 rounded-xl">
                 <Package className="w-5 h-5 text-amber-600" />
@@ -136,7 +136,7 @@ export function ProductsTab() {
                 <DollarSign className="w-5 h-5 text-teal-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-teal-600">{stats.avgPrice} DH</p>
+                <p className="text-2xl font-bold text-teal-600">{stats.avgPrice} DZD</p>
                 <p className="text-sm text-slate-500">Prix Moyen</p>
               </div>
             </div>
@@ -145,7 +145,7 @@ export function ProductsTab() {
       </div>
 
       <Card className="bg-white border-0 shadow-sm">
-        <CardHeader className="border-b border-slate-100">
+        <CardHeader className="border-b border-slate-100 px-6 py-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
             <CardTitle className="text-lg font-semibold text-slate-800">
               Catalogue Produits
@@ -223,7 +223,7 @@ export function ProductsTab() {
                   </div>
                   <div className="flex items-center gap-6 ml-4">
                     <div className="text-right hidden md:block">
-                      <p className="font-semibold text-slate-800">{product.price} DH</p>
+                      <p className="font-semibold text-slate-800">{product.price} DZD</p>
                       <p className={`text-xs ${product.stock < 10 ? 'text-red-500' : 'text-slate-400'}`}>
                         Stock: {product.stock}
                       </p>
