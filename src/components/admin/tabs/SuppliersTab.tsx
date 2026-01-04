@@ -17,7 +17,9 @@ import {
   Ban,
   Check,
   MessageSquare,
-  Clock
+  Clock,
+  Shield,
+  ShieldOff
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -44,6 +46,7 @@ interface Supplier {
   response_rate: number;
   avg_response_time: number;
   is_verified: boolean;
+  is_blocked: boolean;
   created_at: string;
 }
 
@@ -90,6 +93,23 @@ export function SuppliersTab() {
       ));
     } catch (error) {
       console.error('Error updating supplier:', error);
+    }
+  };
+
+  const updateBlockedStatus = async (id: string, isBlocked: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('suppliers')
+        .update({ is_blocked: isBlocked, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setSuppliers(prev => prev.map(s =>
+        s.id === id ? { ...s, is_blocked: isBlocked } : s
+      ));
+    } catch (error) {
+      console.error('Error updating supplier blocked status:', error);
     }
   };
 
@@ -239,13 +259,19 @@ export function SuppliersTab() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium text-slate-800 truncate">{supplier.company_name}</p>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                          supplier.is_verified
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-amber-100 text-amber-700'
-                        }`}>
-                          {supplier.is_verified ? 'Verifie' : 'Non Verifie'}
-                        </span>
+                        {supplier.is_blocked ? (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700">
+                            Bloque
+                          </span>
+                        ) : (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                            supplier.is_verified
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {supplier.is_verified ? 'Verifie' : 'Non Verifie'}
+                          </span>
+                        )}
                         <div className="flex items-center gap-1 text-sm">
                           <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
                           <span className="font-medium text-slate-700">{supplier.average_rating?.toFixed(1) || '0.0'}</span>
@@ -286,9 +312,20 @@ export function SuppliersTab() {
                             Verifier
                           </DropdownMenuItem>
                         ) : (
-                          <DropdownMenuItem onClick={() => updateVerificationStatus(supplier.id, false)} className="text-red-600">
+                          <DropdownMenuItem onClick={() => updateVerificationStatus(supplier.id, false)} className="text-amber-600">
                             <Ban className="w-4 h-4 mr-2" />
                             Revoquer
+                          </DropdownMenuItem>
+                        )}
+                        {!supplier.is_blocked ? (
+                          <DropdownMenuItem onClick={() => updateBlockedStatus(supplier.id, true)} className="text-red-600">
+                            <ShieldOff className="w-4 h-4 mr-2" />
+                            Bloquer
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem onClick={() => updateBlockedStatus(supplier.id, false)} className="text-green-600">
+                            <Shield className="w-4 h-4 mr-2" />
+                            Debloquer
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -399,29 +436,64 @@ export function SuppliersTab() {
                 </div>
               </div>
 
-              <div className="pt-2">
-                {!selectedSupplier.is_verified ? (
-                  <Button
-                    onClick={() => {
-                      updateVerificationStatus(selectedSupplier.id, true);
-                      setSelectedSupplier({ ...selectedSupplier, is_verified: true });
-                    }}
-                    className="w-full bg-green-600 hover:bg-green-700"
-                  >
-                    <Check className="w-4 h-4 mr-2" />
-                    Verifier ce Fournisseur
-                  </Button>
+              <div className="pt-2 space-y-2">
+                {selectedSupplier.is_blocked ? (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-700 font-medium flex items-center gap-2">
+                      <ShieldOff className="w-4 h-4" />
+                      Ce compte est actuellement bloque
+                    </p>
+                  </div>
                 ) : (
+                  <>
+                    {!selectedSupplier.is_verified ? (
+                      <Button
+                        onClick={() => {
+                          updateVerificationStatus(selectedSupplier.id, true);
+                          setSelectedSupplier({ ...selectedSupplier, is_verified: true });
+                        }}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        <Check className="w-4 h-4 mr-2" />
+                        Verifier ce Fournisseur
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          updateVerificationStatus(selectedSupplier.id, false);
+                          setSelectedSupplier({ ...selectedSupplier, is_verified: false });
+                        }}
+                        className="w-full"
+                      >
+                        <Ban className="w-4 h-4 mr-2" />
+                        Revoquer la Verification
+                      </Button>
+                    )}
+                  </>
+                )}
+                {!selectedSupplier.is_blocked ? (
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      updateVerificationStatus(selectedSupplier.id, false);
-                      setSelectedSupplier({ ...selectedSupplier, is_verified: false });
+                      updateBlockedStatus(selectedSupplier.id, true);
+                      setSelectedSupplier({ ...selectedSupplier, is_blocked: true });
                     }}
                     className="w-full"
                   >
-                    <Ban className="w-4 h-4 mr-2" />
-                    Revoquer la Verification
+                    <ShieldOff className="w-4 h-4 mr-2" />
+                    Bloquer ce Compte
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      updateBlockedStatus(selectedSupplier.id, false);
+                      setSelectedSupplier({ ...selectedSupplier, is_blocked: false });
+                    }}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Debloquer ce Compte
                   </Button>
                 )}
               </div>

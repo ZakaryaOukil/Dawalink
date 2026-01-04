@@ -14,7 +14,9 @@ import {
   MoreVertical,
   Eye,
   Ban,
-  Check
+  Check,
+  Shield,
+  ShieldOff
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -37,6 +39,7 @@ interface Pharmacy {
   phone: string;
   address: string;
   is_verified: boolean;
+  is_blocked: boolean;
   created_at: string;
 }
 
@@ -83,6 +86,23 @@ export function PharmaciesTab() {
       ));
     } catch (error) {
       console.error('Error updating pharmacy:', error);
+    }
+  };
+
+  const updateBlockedStatus = async (id: string, isBlocked: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('pharmacies')
+        .update({ is_blocked: isBlocked, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setPharmacies(prev => prev.map(p =>
+        p.id === id ? { ...p, is_blocked: isBlocked } : p
+      ));
+    } catch (error) {
+      console.error('Error updating pharmacy blocked status:', error);
     }
   };
 
@@ -216,13 +236,19 @@ export function PharmaciesTab() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-slate-800 truncate">{pharmacy.pharmacy_name}</p>
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                          pharmacy.is_verified
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-amber-100 text-amber-700'
-                        }`}>
-                          {pharmacy.is_verified ? 'Verifie' : 'Non Verifie'}
-                        </span>
+                        {pharmacy.is_blocked ? (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700">
+                            Bloque
+                          </span>
+                        ) : (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                            pharmacy.is_verified
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {pharmacy.is_verified ? 'Verifie' : 'Non Verifie'}
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
                         <span className="flex items-center gap-1">
@@ -258,9 +284,20 @@ export function PharmaciesTab() {
                             Verifier
                           </DropdownMenuItem>
                         ) : (
-                          <DropdownMenuItem onClick={() => updateVerificationStatus(pharmacy.id, false)} className="text-red-600">
+                          <DropdownMenuItem onClick={() => updateVerificationStatus(pharmacy.id, false)} className="text-amber-600">
                             <Ban className="w-4 h-4 mr-2" />
                             Revoquer
+                          </DropdownMenuItem>
+                        )}
+                        {!pharmacy.is_blocked ? (
+                          <DropdownMenuItem onClick={() => updateBlockedStatus(pharmacy.id, true)} className="text-red-600">
+                            <ShieldOff className="w-4 h-4 mr-2" />
+                            Bloquer
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem onClick={() => updateBlockedStatus(pharmacy.id, false)} className="text-green-600">
+                            <Shield className="w-4 h-4 mr-2" />
+                            Debloquer
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -341,29 +378,64 @@ export function PharmaciesTab() {
                 </div>
               </div>
 
-              <div className="pt-2">
-                {!selectedPharmacy.is_verified ? (
-                  <Button
-                    onClick={() => {
-                      updateVerificationStatus(selectedPharmacy.id, true);
-                      setSelectedPharmacy({ ...selectedPharmacy, is_verified: true });
-                    }}
-                    className="w-full bg-green-600 hover:bg-green-700"
-                  >
-                    <Check className="w-4 h-4 mr-2" />
-                    Verifier cette Pharmacie
-                  </Button>
+              <div className="pt-2 space-y-2">
+                {selectedPharmacy.is_blocked ? (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-700 font-medium flex items-center gap-2">
+                      <ShieldOff className="w-4 h-4" />
+                      Ce compte est actuellement bloque
+                    </p>
+                  </div>
                 ) : (
+                  <>
+                    {!selectedPharmacy.is_verified ? (
+                      <Button
+                        onClick={() => {
+                          updateVerificationStatus(selectedPharmacy.id, true);
+                          setSelectedPharmacy({ ...selectedPharmacy, is_verified: true });
+                        }}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        <Check className="w-4 h-4 mr-2" />
+                        Verifier cette Pharmacie
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          updateVerificationStatus(selectedPharmacy.id, false);
+                          setSelectedPharmacy({ ...selectedPharmacy, is_verified: false });
+                        }}
+                        className="w-full"
+                      >
+                        <Ban className="w-4 h-4 mr-2" />
+                        Revoquer la Verification
+                      </Button>
+                    )}
+                  </>
+                )}
+                {!selectedPharmacy.is_blocked ? (
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      updateVerificationStatus(selectedPharmacy.id, false);
-                      setSelectedPharmacy({ ...selectedPharmacy, is_verified: false });
+                      updateBlockedStatus(selectedPharmacy.id, true);
+                      setSelectedPharmacy({ ...selectedPharmacy, is_blocked: true });
                     }}
                     className="w-full"
                   >
-                    <Ban className="w-4 h-4 mr-2" />
-                    Revoquer la Verification
+                    <ShieldOff className="w-4 h-4 mr-2" />
+                    Bloquer ce Compte
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      updateBlockedStatus(selectedPharmacy.id, false);
+                      setSelectedPharmacy({ ...selectedPharmacy, is_blocked: false });
+                    }}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Debloquer ce Compte
                   </Button>
                 )}
               </div>

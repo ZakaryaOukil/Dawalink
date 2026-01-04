@@ -78,22 +78,6 @@ export function OrdersTab() {
     }
   };
 
-  const updateOrderStatus = async (id: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus, updated_at: new Date().toISOString() })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setOrders(prev => prev.map(o =>
-        o.id === id ? { ...o, status: newStatus } : o
-      ));
-    } catch (error) {
-      console.error('Error updating order:', error);
-    }
-  };
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch =
@@ -252,27 +236,12 @@ export function OrdersTab() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4 ml-4">
-                      <div className="text-right hidden md:block">
+                      <div className="text-right">
                         <p className="font-semibold text-slate-800">{order.total_price.toLocaleString()} DZD</p>
                         <p className="text-xs text-slate-400">
                           {new Date(order.created_at).toLocaleDateString('fr-FR')}
                         </p>
                       </div>
-                      <Select
-                        value={order.status}
-                        onValueChange={(value) => updateOrderStatus(order.id, value)}
-                      >
-                        <SelectTrigger className="w-32 h-8 text-xs bg-slate-50 border-0">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">En attente</SelectItem>
-                          <SelectItem value="confirmed">Confirme</SelectItem>
-                          <SelectItem value="shipped">Expedie</SelectItem>
-                          <SelectItem value="delivered">Livre</SelectItem>
-                          <SelectItem value="cancelled">Annule</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
                   </div>
                 );
