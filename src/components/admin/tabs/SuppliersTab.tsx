@@ -296,47 +296,63 @@ export function SuppliersTab() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    <span className="text-xs text-slate-400 hidden md:block">
+                    <span className="text-xs text-slate-400 hidden md:block mr-2">
                       {new Date(supplier.created_at).toLocaleDateString('fr-FR')}
                     </span>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => {
-                          setSelectedSupplier(supplier);
-                          setIsDetailOpen(true);
-                        }}>
-                          <Eye className="w-4 h-4 mr-2" />
-                          Voir Details
-                        </DropdownMenuItem>
-                        {!supplier.is_verified ? (
-                          <DropdownMenuItem onClick={() => updateVerificationStatus(supplier.id, true)} className="text-green-600">
-                            <Check className="w-4 h-4 mr-2" />
-                            Verifier
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem onClick={() => updateVerificationStatus(supplier.id, false)} className="text-amber-600">
-                            <Ban className="w-4 h-4 mr-2" />
-                            Revoquer
-                          </DropdownMenuItem>
-                        )}
-                        {!supplier.is_blocked ? (
-                          <DropdownMenuItem onClick={() => updateBlockedStatus(supplier.id, true)} className="text-red-600">
-                            <ShieldOff className="w-4 h-4 mr-2" />
-                            Bloquer
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem onClick={() => updateBlockedStatus(supplier.id, false)} className="text-green-600">
-                            <Shield className="w-4 h-4 mr-2" />
-                            Debloquer
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedSupplier(supplier);
+                        setIsDetailOpen(true);
+                      }}
+                      className="h-8 px-3"
+                    >
+                      <Eye className="w-4 h-4 mr-1.5" />
+                      Details
+                    </Button>
+                    {!supplier.is_verified ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateVerificationStatus(supplier.id, true)}
+                        className="h-8 px-3 text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                      >
+                        <Check className="w-4 h-4 mr-1.5" />
+                        Verifier
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateVerificationStatus(supplier.id, false)}
+                        className="h-8 px-3 text-amber-600 border-amber-600 hover:bg-amber-50 hover:text-amber-700"
+                      >
+                        <Ban className="w-4 h-4 mr-1.5" />
+                        Revoquer
+                      </Button>
+                    )}
+                    {!supplier.is_blocked ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateBlockedStatus(supplier.id, true)}
+                        className="h-8 px-3 text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
+                      >
+                        <ShieldOff className="w-4 h-4 mr-1.5" />
+                        Bloquer
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateBlockedStatus(supplier.id, false)}
+                        className="h-8 px-3 text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                      >
+                        <Shield className="w-4 h-4 mr-1.5" />
+                        Debloquer
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}

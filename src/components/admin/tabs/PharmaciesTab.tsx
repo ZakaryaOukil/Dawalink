@@ -268,47 +268,63 @@ export function PharmaciesTab() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    <span className="text-xs text-slate-400 hidden md:block">
+                    <span className="text-xs text-slate-400 hidden md:block mr-2">
                       {new Date(pharmacy.created_at).toLocaleDateString('fr-FR')}
                     </span>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => {
-                          setSelectedPharmacy(pharmacy);
-                          setIsDetailOpen(true);
-                        }}>
-                          <Eye className="w-4 h-4 mr-2" />
-                          Voir Details
-                        </DropdownMenuItem>
-                        {!pharmacy.is_verified ? (
-                          <DropdownMenuItem onClick={() => updateVerificationStatus(pharmacy.id, true)} className="text-green-600">
-                            <Check className="w-4 h-4 mr-2" />
-                            Verifier
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem onClick={() => updateVerificationStatus(pharmacy.id, false)} className="text-amber-600">
-                            <Ban className="w-4 h-4 mr-2" />
-                            Revoquer
-                          </DropdownMenuItem>
-                        )}
-                        {!pharmacy.is_blocked ? (
-                          <DropdownMenuItem onClick={() => updateBlockedStatus(pharmacy.id, true)} className="text-red-600">
-                            <ShieldOff className="w-4 h-4 mr-2" />
-                            Bloquer
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem onClick={() => updateBlockedStatus(pharmacy.id, false)} className="text-green-600">
-                            <Shield className="w-4 h-4 mr-2" />
-                            Debloquer
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPharmacy(pharmacy);
+                        setIsDetailOpen(true);
+                      }}
+                      className="h-8 px-3"
+                    >
+                      <Eye className="w-4 h-4 mr-1.5" />
+                      Details
+                    </Button>
+                    {!pharmacy.is_verified ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateVerificationStatus(pharmacy.id, true)}
+                        className="h-8 px-3 text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                      >
+                        <Check className="w-4 h-4 mr-1.5" />
+                        Verifier
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateVerificationStatus(pharmacy.id, false)}
+                        className="h-8 px-3 text-amber-600 border-amber-600 hover:bg-amber-50 hover:text-amber-700"
+                      >
+                        <Ban className="w-4 h-4 mr-1.5" />
+                        Revoquer
+                      </Button>
+                    )}
+                    {!pharmacy.is_blocked ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateBlockedStatus(pharmacy.id, true)}
+                        className="h-8 px-3 text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
+                      >
+                        <ShieldOff className="w-4 h-4 mr-1.5" />
+                        Bloquer
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => updateBlockedStatus(pharmacy.id, false)}
+                        className="h-8 px-3 text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+                      >
+                        <Shield className="w-4 h-4 mr-1.5" />
+                        Debloquer
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
