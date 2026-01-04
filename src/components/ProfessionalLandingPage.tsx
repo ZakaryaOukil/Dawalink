@@ -1,12 +1,13 @@
-import { Building2, Store, Shield, Users, Star, Search, Zap, Package, FileCheck, TrendingUp, CheckCircle, ArrowRight, Phone, Mail } from 'lucide-react';
+import { Building2, Store, Shield, Users, Star, Search, Zap, Package, FileCheck, TrendingUp, CheckCircle, ArrowRight, Phone, Mail, Lock } from 'lucide-react';
 import { UserType } from '../App';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface ProfessionalLandingPageProps {
   onGetStarted: (type: UserType) => void;
+  onAdminAccess?: () => void;
 }
 
-export function ProfessionalLandingPage({ onGetStarted }: ProfessionalLandingPageProps) {
+export function ProfessionalLandingPage({ onGetStarted, onAdminAccess }: ProfessionalLandingPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#e8f5f0] via-[#f0f9f5] to-[#e3f4ed]">
       {/* Header */}
@@ -462,8 +463,17 @@ export function ProfessionalLandingPage({ onGetStarted }: ProfessionalLandingPag
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8 text-center">
+          <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p>© 2025 DawaLink. Tous droits réservés.</p>
+            {onAdminAccess && (
+              <button
+                onClick={onAdminAccess}
+                className="flex items-center gap-2 text-gray-500 hover:text-gray-300 transition-colors text-sm"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                Administration
+              </button>
+            )}
           </div>
         </div>
       </footer>
